@@ -9,15 +9,18 @@
 import SwiftUI
 
 struct ToDoItemView: View {
+    
+    @Environment(\.managedObjectContext)var managedObjectContext
     var title:String=""
     var createdAt:String=""
+    var completed:Bool=false
     var body: some View {
-        HStack{
+        
             VStack(alignment: .leading){
-                Text(title).font(.headline)
-                Text(createdAt).font(.caption)
+            Text(title).font(.headline)
+            Text(createdAt).font(.caption)
             }
-        }
+        
     }
 }
 

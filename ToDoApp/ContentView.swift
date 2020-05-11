@@ -23,7 +23,7 @@ struct ContentView: View {
                             let toDoItem = ToDoItem(context: self.managedObjectContext)
                             toDoItem.title = self.newTodoItem
                             toDoItem.createdAt=Date()
-                            
+                            toDoItem.completed=false
                             do{
                                 try self.managedObjectContext.save()
                             }catch{
@@ -38,7 +38,18 @@ struct ContentView: View {
                 Section(header:Text("Sarcini")){
                     ForEach(self.toDoItems){
                         toDoItem in
-                        ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)")
+                        HStack{
+                            Button(action:{
+                                toDoItem.completed = !toDoItem.completed
+                                do{
+                                    try self.managedObjectContext.save()
+                                }catch{
+                                    print(error)
+                                }
+                            }){
+                                Image(systemName:"circle\(toDoItem.completed ?".fill":"")")
+                            }
+                            ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)",completed: toDoItem.completed)}
                     }.onDelete{
                         indexSet in let deleteItem = self.toDoItems[indexSet.first!]
                         self.managedObjectContext.delete(deleteItem)
@@ -50,7 +61,20 @@ struct ContentView: View {
                     }
                 }
             }.navigationBarTitle(Text("Lista de sarcini"))
-            .navigationBarItems(trailing: EditButton())
+                .navigationBarItems(leading:Button(action:{
+                    self.toDoItems.forEach{
+                       toDoItem in toDoItem.completed = false
+                    do{
+                        try self.managedObjectContext.save()
+                    }catch{
+                        print(error)
+                        }
+                    }
+                }){
+                    Text("Reset completed").foregroundColor(.blue)
+                } ,trailing:
+                    EditButton()
+                )
         }
     }
 }

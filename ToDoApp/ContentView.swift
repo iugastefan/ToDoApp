@@ -16,7 +16,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView{
             List{
-                Section(){
+                Section(header:Text("Adauga sarcina")){
                     HStack{
                         TextField("Sarcina noua",text:self.$newTodoItem)
                         Button(action: {
@@ -35,9 +35,13 @@ struct ContentView: View {
                         }
                     }
                 }.font(.headline)
+                
                 Section(header:Text("Sarcini")){
                     ForEach(self.toDoItems){
                         toDoItem in
+                        
+                        if(!toDoItem.completed){
+                        
                         HStack{
                             Button(action:{
                                 toDoItem.completed = !toDoItem.completed
@@ -48,19 +52,57 @@ struct ContentView: View {
                                 }
                             }){
                                 Image(systemName:"circle\(toDoItem.completed ?".fill":"")")
+                                    .foregroundColor(toDoItem.completed ?.green:.red)
                             }
                             ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)",completed: toDoItem.completed)}
-                    }.onDelete{
-                        indexSet in let deleteItem = self.toDoItems[indexSet.first!]
-                        self.managedObjectContext.delete(deleteItem)
-                        do{
-                            try self.managedObjectContext.save()
-                        }catch{
-                            print(error)
-                        }
                     }
+                    }
+                    .onDelete{
+                            indexSet in let deleteItem = self.toDoItems[indexSet.first!]
+                            self.managedObjectContext.delete(deleteItem)
+                            do{
+                                try self.managedObjectContext.save()
+                            }catch{
+                            print(error)
+                            }
+                        }
+                
                 }
-            }.navigationBarTitle(Text("Lista de sarcini"))
+                Section(header:Text("Sarcini completate")){
+                    ForEach(self.toDoItems){
+                        toDoItem in
+                        
+                        if(toDoItem.completed){
+                        
+                        HStack{
+                            Button(action:{
+                                toDoItem.completed = !toDoItem.completed
+                                do{
+                                    try self.managedObjectContext.save()
+                                }catch{
+                                    print(error)
+                                }
+                            }){
+                                Image(systemName:"circle\(toDoItem.completed ?".fill":"")")
+                                    .foregroundColor(toDoItem.completed ?.green:.red)
+                            }
+                            ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)",completed: toDoItem.completed)}
+                    }
+                    }
+                    .onDelete{
+                            indexSet in let deleteItem = self.toDoItems[indexSet.first!]
+                            self.managedObjectContext.delete(deleteItem)
+                            do{
+                                try self.managedObjectContext.save()
+                            }catch{
+                            print(error)
+                            }
+                        }
+                
+                }
+                
+                
+                }.navigationBarTitle(Text("Lista de sarcini"))
                 .navigationBarItems(leading:Button(action:{
                     self.toDoItems.forEach{
                        toDoItem in toDoItem.completed = false
@@ -74,7 +116,7 @@ struct ContentView: View {
                     Text("Reset completed").foregroundColor(.blue)
                 } ,trailing:
                     EditButton()
-                )
+            )
         }
     }
 }

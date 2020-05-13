@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var newTodoItem=""
     
     var body: some View {
+        TabView{
         NavigationView{
             List{
                 Section(header:Text("Adauga sarcina")){
@@ -68,56 +69,74 @@ struct ContentView: View {
                         }
                 
                 }
-                Section(header:Text("Sarcini completate")){
+                                
+                
+            }.navigationBarTitle(Text("Lista de sarcini"))
+                .navigationBarItems(trailing:
+                    EditButton()
+            )
+            }.tabItem{
+                Image(systemName: "house.fill")
+                Text("Sarcini")}
+            
+            NavigationView{
+                List{
                     ForEach(self.toDoItems){
-                        toDoItem in
-                        
-                        if(toDoItem.completed){
-                        
-                        HStack{
-                            Button(action:{
-                                toDoItem.completed = !toDoItem.completed
-                                do{
-                                    try self.managedObjectContext.save()
-                                }catch{
-                                    print(error)
-                                }
-                            }){
-                                Image(systemName:"circle\(toDoItem.completed ?".fill":"")")
-                                    .foregroundColor(toDoItem.completed ?.green:.red)
-                            }
-                            ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)",completed: toDoItem.completed)}
-                    }
-                    }
-                    .onDelete{
-                            indexSet in let deleteItem = self.toDoItems[indexSet.first!]
-                            self.managedObjectContext.delete(deleteItem)
+                    toDoItem in
+                    
+                    if(toDoItem.completed){
+                    
+                    HStack{
+                        Button(action:{
+                            toDoItem.completed = !toDoItem.completed
                             do{
                                 try self.managedObjectContext.save()
                             }catch{
-                            print(error)
+                                print(error)
                             }
+                        }){
+                            Image(systemName:"checkmark.circle\(toDoItem.completed ?".fill":"")")
+                                .foregroundColor(toDoItem.completed ?.green:.red)
                         }
-                
+                        ToDoItemView(title: toDoItem.title!, createdAt: "\(toDoItem.createdAt!)",completed: toDoItem.completed)}
                 }
-                
-                
-                }.navigationBarTitle(Text("Lista de sarcini"))
-                .navigationBarItems(leading:Button(action:{
-                    self.toDoItems.forEach{
-                       toDoItem in toDoItem.completed = false
-                    do{
-                        try self.managedObjectContext.save()
-                    }catch{
+                }
+                .onDelete{
+                        indexSet in let deleteItem = self.toDoItems[indexSet.first!]
+                        self.managedObjectContext.delete(deleteItem)
+                        do{
+                            try self.managedObjectContext.save()
+                        }catch{
                         print(error)
                         }
                     }
-                }){
-                    Text("Reset completed").foregroundColor(.blue)
-                } ,trailing:
-                    EditButton()
-            )
-        }
+                }.navigationBarTitle(Text("Sarcini indeplinite"))
+                    .navigationBarItems(leading:Button(action:{
+                        self.toDoItems.forEach{
+                           toDoItem in toDoItem.completed = false
+                        do{
+                            try self.managedObjectContext.save()
+                        }catch{
+                            print(error)
+                            }
+                        }
+                    }){
+                        Text("Reset").foregroundColor(.blue)
+                    } ,trailing:
+                        EditButton()
+                )
+
+                
+            }.tabItem{
+                Image(systemName: "checkmark.circle.fill")
+                Text("Sarcini indeplinite")
+            
+            }
+            
+            
+                
+
+        }.font(.headline)
     }
 }
 
